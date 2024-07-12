@@ -30,12 +30,9 @@ def clean_data(data):
     data[columns_to_convert] = data[columns_to_convert].astype(object)
 
     # (3) Set 'EmployeeNumber' as the index
-    data.set_index('EmployeeNumber', inplace=True)
+    data.drop('EmployeeNumber', axis = 1, inplace=True)
 
-    # (4) Remove rows with numerical features having absolute z-score > 3
-    numerical_cols = data.select_dtypes(include=['float64', 'int64']).columns
-    z_scores = np.abs(data[numerical_cols].apply(lambda x: (x - x.mean()) / x.std(), axis=0))
-    data = data[(z_scores <= 3).all(axis=1)]
+
 
     # (5) Save the cleaned data
     file_path = os.path.join('data', 'processed', 'cleaned_data.csv')
