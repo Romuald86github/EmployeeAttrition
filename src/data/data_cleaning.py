@@ -35,7 +35,7 @@ def clean_data(data):
 
 
     # (5) Save the cleaned data
-    file_path = os.path.join('data', 'processed', 'cleaned_data.csv')
+    file_path = os.path.join('data', 'processed', 'clean_data.csv')
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     data.to_csv(file_path)
 
