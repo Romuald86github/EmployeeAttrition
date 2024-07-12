@@ -2,9 +2,8 @@ import os
 import pandas as pd
 import numpy as np
 import requests
-from mage_ai import data_loader, data_exporter
 
-@data_loader
+
 def load_data(url):
     """Load the raw data from the provided URL and save it to the 'data/raw/' directory."""
     response = requests.get(url)
@@ -18,7 +17,7 @@ def load_data(url):
 
     return data
 
-@data_exporter
+
 def clean_data(data):
     """Clean the raw data."""
     # (1) Convert 'MonthlyIncome' and 'MonthlyRate' columns to float
@@ -46,6 +45,6 @@ def clean_data(data):
     return data
 
 if __name__ == "__main__":
-    url = "https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset"
+    url = 'https://raw.githubusercontent.com/Romuald86github/Internship/main/employee_attrition.csv'
     raw_data = load_data(url)
     clean_data(raw_data)
