@@ -46,5 +46,5 @@ def preprocess_data(data, target_column):
     # Save the preprocessed data
     pd.to_pickle((X_train, X_val, X_test, y_train, y_val, y_test), 'data/processed/preprocessed_data.pkl')
 
-    return X_train, X_val, X_test, y_train, y_val, y_test
+    
     
