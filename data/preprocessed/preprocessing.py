@@ -91,8 +91,8 @@ def save_to_s3(X_train, X_val, X_test, y_train, y_val, y_test, preprocessing_pip
 
     # Save preprocessing pipeline to S3
     import joblib
-    joblib.dump(preprocessing_pipeline, 'models/preprocessing_pipeline.pkl')
-    s3_client.upload_file('models/preprocessing_pipeline.pkl', bucket_name, f"{artifact_path}/preprocessing_pipeline.pkl")
+    joblib.dump(preprocessing_pipeline, 'src/models/preprocessing_pipeline.pkl')
+    s3_client.upload_file('src/models/preprocessing_pipeline.pkl', bucket_name, f"{artifact_path}/preprocessing_pipeline.pkl")
 
 if __name__ == "__main__":
     data, target_column = load_data()
