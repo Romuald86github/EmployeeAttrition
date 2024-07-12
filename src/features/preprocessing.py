@@ -3,15 +3,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from imblearn.over_sampling import RandomOverSampler
 from scipy.stats import yeojohnson
-from mage_ai import data_loader, data_exporter
 
-@data_loader
+
+
 def load_data():
     data = pd.read_csv("data/processed/selected_data.csv")
     target_column = "Attrition"
     return data, target_column
 
-@data_exporter
+
 def preprocess_data(data, target_column):
     X = data.drop(columns=[target_column])
     y = data[target_column]
