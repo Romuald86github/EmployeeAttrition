@@ -2,22 +2,25 @@ import os
 import pandas as pd
 import numpy as np
 import requests
+from io import StringIO
+from mage_ai.data_preparation.decorators import data_loader, data_exporter
 
-
+@data_loader
 def load_data(url):
-    """Load the raw data from the provided URL and save it to the 'data/raw/' directory."""
+    """Load the raw data from the provided URL and save it to the 'data_loaders/raw_data.csv' file."""
     response = requests.get(url)
-    data = pd.read_csv(pd.compat.StringIO(response.text))
 
-    # Create the 'data/raw/' directory if it doesn't exist
-    os.makedirs('data/raw', exist_ok=True)
+    # Save the raw data to 'data_loaders/raw_data.csv'
+    file_path = os.path.join('my-attrition-prediction-project', 'data_loaders', 'raw_data.csv')
+    with open(file_path, 'wb') as f:
+        f.write(response.content)
 
-    # Save the raw data to 'data/raw/raw_data.csv'
-    data.to_csv('data/raw/raw_data.csv', index=False)
+    # Read the CSV data
+    data = pd.read_csv(file_path)
 
     return data
 
-
+@data_exporter
 def clean_data(data):
     """Clean the raw data."""
     # (1) Convert 'MonthlyIncome' and 'MonthlyRate' columns to float
@@ -32,19 +35,19 @@ def clean_data(data):
     # (3) Set 'EmployeeNumber' as the index
     data.set_index('EmployeeNumber', inplace=True)
 
-    # (4) Remove numerical features with absolute z-score > 3
+    # (4) Remove rows with numerical features having absolute z-score > 3
     numerical_cols = data.select_dtypes(include=['float64', 'int64']).columns
     z_scores = np.abs(data[numerical_cols].apply(lambda x: (x - x.mean()) / x.std(), axis=0))
-    outlier_cols = z_scores[z_scores > 3].any().index
-    data = data.drop(outlier_cols, axis=1)
+    data = data[(z_scores <= 3).all(axis=1)]
 
     # (5) Save the cleaned data
-    os.makedirs('data/processed', exist_ok=True)
-    data.to_csv('data/processed/clean_data.csv', index=False)
+    file_path = os.path.join('my-attrition-prediction-project', 'transformers', 'clean_data.csv')
+    data.to_csv(file_path)
 
     return data
 
 if __name__ == "__main__":
-    url = 'https://raw.githubusercontent.com/Romuald86github/Internship/main/employee_attrition.csv'
+    url = "https://raw.githubusercontent.com/Romuald86github/Internship/main/employee_attrition.csv"
     raw_data = load_data(url)
-    clean_data(raw_data)
+    cleaned_data = clean_data(raw_data)
+
