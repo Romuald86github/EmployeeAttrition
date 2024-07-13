@@ -1,20 +1,44 @@
 import os
-import mlflow
-import mlflow.sklearn
+import boto3
+import joblib
+import pickle
 from flask import Flask, request, jsonify
 import pandas as pd
 
 app = Flask(__name__)
 
-# Load the best model from the MLflow registry
-model_name = "RandomForestClassifier"
-model_version = "1"
-model_path = f"models:/{model_name}/{model_version}"
-model = mlflow.sklearn.load_model(model_path)
+# Set the S3 bucket and path
+bucket_name = "attritionproject"
+artifact_path = "attrition/artifacts"
 
-# Load the preprocessing pipeline
-preprocessing_pipeline_path = "models:/preprocessing_pipeline/1"
-preprocessing_pipeline = mlflow.sklearn.load_model(preprocessing_pipeline_path)
+# Ensure AWS credentials are set in the environment
+aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+aws_region = os.getenv('AWS_DEFAULT_REGION')
+
+# Initialize boto3 client
+s3_client = boto3.client(
+    's3',
+    region_name=aws_region,
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key
+)
+
+def download_from_s3(bucket_name, key, download_path):
+    s3_client.download_file(bucket_name, key, download_path)
+
+# Download and load the best model from S3
+model_key = f"{artifact_path}/best_model.pkl"
+model_download_path = "best_model.pkl"
+download_from_s3(bucket_name, model_key, model_download_path)
+with open(model_download_path, 'rb') as f:
+    model = pickle.load(f)
+
+# Download and load the preprocessing pipeline from S3
+pipeline_key = f"{artifact_path}/preprocessing_pipeline.pkl"
+pipeline_download_path = "preprocessing_pipeline.pkl"
+download_from_s3(bucket_name, pipeline_key, pipeline_download_path)
+preprocessing_pipeline = joblib.load(pipeline_download_path)
 
 @app.route('/predict', methods=['POST'])
 def predict():
