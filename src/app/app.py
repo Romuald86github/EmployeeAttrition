@@ -1,21 +1,21 @@
 import os
-import boto3
-import joblib
-import pickle
+import mlflow
+import mlflow.sklearn
 from flask import Flask, request, jsonify
 import pandas as pd
-from scipy.stats import yeojohnson
+import boto3
 
 app = Flask(__name__)
+
+# Set up AWS credentials
+aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+aws_region = os.getenv('AWS_DEFAULT_REGION')
 
 # Set the S3 bucket and path
 bucket_name = "attritionproject"
 artifact_path = "attrition/artifacts"
-
-# Ensure AWS credentials are set in the environment
-aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-aws_region = os.getenv('AWS_DEFAULT_REGION')
+artifact_uri = f"s3://{bucket_name}/{artifact_path}"
 
 # Initialize boto3 client
 s3_client = boto3.client(
@@ -25,36 +25,15 @@ s3_client = boto3.client(
     aws_secret_access_key=aws_secret_access_key
 )
 
-def download_from_s3(bucket_name, key, download_path):
-    s3_client.download_file(bucket_name, key, download_path)
+# Load the best model from S3
+model_name = "RandomForestClassifier"
+model_version = "1"
+model_path = f"s3://{bucket_name}/{artifact_path}/best_model.pkl"
+model = mlflow.sklearn.load_model(model_path)
 
-# Define remove_skewness function
-def remove_skewness(X):
-    columns_to_transform = ['DistanceFromHome', 'TotalWorkingYears', 'YearsAtCompany']
-    for col in columns_to_transform:
-        X[col], _ = yeojohnson(X[col])
-    return X
-
-# Function to load joblib with custom globals
-def load_with_custom_globals(filepath, custom_globals):
-    with open(filepath, 'rb') as file:
-        return joblib.load(file)
-
-# Download and load the best model from S3
-model_key = f"{artifact_path}/best_model.pkl"
-model_download_path = "best_model.pkl"
-download_from_s3(bucket_name, model_key, model_download_path)
-with open(model_download_path, 'rb') as f:
-    model = pickle.load(f)
-
-# Download and load the preprocessing pipeline from S3
-pipeline_key = f"{artifact_path}/preprocessing_pipeline.pkl"
-pipeline_download_path = "preprocessing_pipeline.pkl"
-download_from_s3(bucket_name, pipeline_key, pipeline_download_path)
-
-# Ensure remove_skewness is in the current namespace
-custom_globals = {'remove_skewness': remove_skewness}
-preprocessing_pipeline = load_with_custom_globals(pipeline_download_path, custom_globals)
+# Load the preprocessing pipeline from S3
+preprocessing_pipeline_path = f"s3://{bucket_name}/{artifact_path}/preprocessing_pipeline.pkl"
+preprocessing_pipeline = mlflow.sklearn.load_model(preprocessing_pipeline_path)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -65,4 +44,4 @@ def predict():
     return jsonify({'prediction': int(prediction[0])})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5007)
+    app.run(host='0.0.0.0', port=5000)
