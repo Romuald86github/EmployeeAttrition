@@ -4,6 +4,7 @@ import mlflow.sklearn
 from flask import Flask, request, jsonify
 import pandas as pd
 import boto3
+import pickle
 
 app = Flask(__name__)
 
@@ -29,11 +30,20 @@ s3_client = boto3.client(
 model_name = "RandomForestClassifier"
 model_version = "1"
 model_path = f"s3://{bucket_name}/{artifact_path}/best_model.pkl"
-model = mlflow.sklearn.load_model(model_path)
+
+local_model_path = os.path.join(".", "best_model.pkl")
+s3_client.download_file(bucket_name, f"{artifact_path}/best_model.pkl", local_model_path)
+
+with open(local_model_path, 'rb') as f:
+    model = pickle.load(f)
 
 # Load the preprocessing pipeline from S3
 preprocessing_pipeline_path = f"s3://{bucket_name}/{artifact_path}/preprocessing_pipeline.pkl"
-preprocessing_pipeline = mlflow.sklearn.load_model(preprocessing_pipeline_path)
+local_pipeline_path = os.path.join(".", "preprocessing_pipeline.pkl")
+s3_client.download_file(bucket_name, f"{artifact_path}/preprocessing_pipeline.pkl", local_pipeline_path)
+
+with open(local_pipeline_path, 'rb') as f:
+    preprocessing_pipeline = pickle.load(f)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -44,4 +54,4 @@ def predict():
     return jsonify({'prediction': int(prediction[0])})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5008)
+    app.run(host='0.0.0.0', port=5000)
