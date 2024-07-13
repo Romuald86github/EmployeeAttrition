@@ -126,10 +126,12 @@ def train_and_evaluate_models(X_train, y_train, X_val, y_val, X_test, y_test):
         mlflow.sklearn.log_model(best_model, artifact_path="RandomForestClassifier", registered_model_name="RandomForestClassifier")
 
         # Save the model to S3
-        model_path = f"{artifact_path}/best_model.pkl"
+        model_dir = os.path.join(artifact_path)
+        os.makedirs(model_dir, exist_ok=True)
+        model_path = os.path.join(model_dir, 'best_model.pkl')
         with open(model_path, 'wb') as f:
             pickle.dump(best_model, f)
-        s3_client.upload_file(model_path, bucket_name, model_path)
+        s3_client.upload_file(model_path, bucket_name, f"{artifact_path}/best_model.pkl")
         os.remove(model_path)
 
         print(f"Tuned RandomForestClassifier validation accuracy: {val_accuracy}, test accuracy: {test_accuracy}")
