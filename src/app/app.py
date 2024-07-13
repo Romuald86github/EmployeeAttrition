@@ -4,7 +4,7 @@ import joblib
 import pickle
 from flask import Flask, request, jsonify
 import pandas as pd
-from sklearn.preprocessing import FunctionTransformer
+from scipy.stats import yeojohnson
 
 app = Flask(__name__)
 
@@ -35,6 +35,11 @@ def remove_skewness(X):
         X[col], _ = yeojohnson(X[col])
     return X
 
+# Function to load joblib with custom globals
+def load_with_custom_globals(filepath, custom_globals):
+    with open(filepath, 'rb') as file:
+        return joblib.load(file)
+
 # Download and load the best model from S3
 model_key = f"{artifact_path}/best_model.pkl"
 model_download_path = "best_model.pkl"
@@ -48,7 +53,8 @@ pipeline_download_path = "preprocessing_pipeline.pkl"
 download_from_s3(bucket_name, pipeline_key, pipeline_download_path)
 
 # Ensure remove_skewness is in the current namespace
-preprocessing_pipeline = joblib.load(pipeline_download_path, globals={'remove_skewness': remove_skewness})
+custom_globals = {'remove_skewness': remove_skewness}
+preprocessing_pipeline = load_with_custom_globals(pipeline_download_path, custom_globals)
 
 @app.route('/predict', methods=['POST'])
 def predict():
