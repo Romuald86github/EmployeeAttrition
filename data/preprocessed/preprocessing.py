@@ -91,10 +91,10 @@ def save_to_s3(X_train, X_val, X_test, y_train, y_val, y_test, preprocessing_pip
     s3_client.upload_file('data/processed/preprocessed_data.pkl', bucket_name, f"{artifact_path}/preprocessed_data.pkl")
 
     # Save preprocessing pipeline to S3
-    import joblib
-    joblib.dump(preprocessing_pipeline, 'src/models/preprocessing_pipeline.pkl')
+    import pickle
+    with open('src/models/preprocessing_pipeline.pkl', 'wb') as f:
+        pickle.dump(preprocessing_pipeline, f)
     s3_client.upload_file('src/models/preprocessing_pipeline.pkl', bucket_name, f"{artifact_path}/preprocessing_pipeline.pkl")
-
 if __name__ == "__main__":
     data, target_column = load_data()
     X_train, X_val, X_test, y_train, y_val, y_test = preprocess_data(data, target_column)

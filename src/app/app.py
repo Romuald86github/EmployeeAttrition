@@ -49,7 +49,7 @@ with open(local_pipeline_path, 'rb') as f:
 def predict():
     data = request.get_json()
     df = pd.DataFrame([data])
-    X_preprocessed = preprocessing_pipeline.fit_transform(df)
+    X_preprocessed = preprocessing_pipeline.transform(df)
     prediction = model.predict(X_preprocessed)
     return jsonify({'prediction': int(prediction[0])})
 
