@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/app /app
-EXPOSE 5000
+COPY src/app/ /app/
+EXPOSE 5010
 
-CMD ["python", "app.py"]
+CMD ["python", "/app/app.py"]
