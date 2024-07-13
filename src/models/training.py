@@ -3,10 +3,10 @@ import pickle
 import mlflow
 import mlflow.sklearn
 import json
-import boto3
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+import boto3
 
 def load_data():
     with open('data/processed/preprocessed_data.pkl', 'rb') as f:
@@ -72,7 +72,7 @@ def train_and_evaluate_models(X_train, y_train, X_val, y_val, X_test, y_test):
             mlflow.log_metric("test_f1", test_f1)
             mlflow.log_metric("val_roc_auc", val_roc_auc)
             mlflow.log_metric("test_roc_auc", test_roc_auc)
-            mlflow.sklearn.log_model(model, type(model).__name__, registered_model_name=type(model).__name__)
+            mlflow.sklearn.log_model(model, artifact_path="RandomForestClassifier")
 
     # Perform hyperparameter tuning on the best model
     if isinstance(best_model, RandomForestClassifier):
@@ -123,7 +123,14 @@ def train_and_evaluate_models(X_train, y_train, X_val, y_val, X_test, y_test):
         mlflow.log_metric("test_f1", test_f1)
         mlflow.log_metric("val_roc_auc", val_roc_auc)
         mlflow.log_metric("test_roc_auc", test_roc_auc)
-        mlflow.sklearn.log_model(best_model, "RandomForestClassifier", registered_model_name="RandomForestClassifier", artifact_path=artifact_uri)
+        mlflow.sklearn.log_model(best_model, artifact_path="RandomForestClassifier", registered_model_name="RandomForestClassifier")
+
+        # Save the model to S3
+        model_path = f"{artifact_path}/best_model.pkl"
+        with open(model_path, 'wb') as f:
+            pickle.dump(best_model, f)
+        s3_client.upload_file(model_path, bucket_name, model_path)
+        os.remove(model_path)
 
         print(f"Tuned RandomForestClassifier validation accuracy: {val_accuracy}, test accuracy: {test_accuracy}")
 
