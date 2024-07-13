@@ -25,6 +25,8 @@ def preprocess_data(data, target_column):
     X = data.drop(columns=[target_column])
     y = data[target_column]
 
+    X = remove_skewness(X)
+
 
     # Encode target
     le = LabelEncoder()
@@ -59,10 +61,6 @@ def preprocess_data(data, target_column):
     X_val = preprocessing_pipeline.transform(X_val)
     X_test = preprocessing_pipeline.transform(X_test)
 
-    # Remove skewness
-    X_train = remove_skewness(X_train)
-    X_val = remove_skewness(X_val)
-    X_test = remove_skewness(X_test)
 
     # Save the preprocessed data and pipeline to AWS S3
     save_to_s3(X_train, X_val, X_test, y_train, y_val, y_test, preprocessing_pipeline)
