@@ -52,7 +52,6 @@ def preprocess_data(data, target_column):
 
     # Create preprocessing pipeline
     preprocessing_pipeline = Pipeline(steps=[
-        ('skewness_transformer', FunctionTransformer(remove_skewness, validate=False)),
         ('column_transformer', column_transformer),
         ('scaler', scaler)
     ])
