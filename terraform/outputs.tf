@@ -5,10 +5,10 @@ output "s3_bucket_name" {
 
 output "elastic_beanstalk_environment_name" {
   description = "Name of the Elastic Beanstalk environment"
-  value       = aws_elastic_beanstalk_environment.my_flask_app_env.name
+  value       = aws_elastic_beanstalk_environment.attrition-app-env.name
 }
 
 output "elastic_beanstalk_environment_url" {
   description = "URL of the Elastic Beanstalk environment"
-  value       = aws_elastic_beanstalk_environment.my_flask_app_env.cname
+  value       = aws_elastic_beanstalk_environment.attrition-app-env.cname
 }

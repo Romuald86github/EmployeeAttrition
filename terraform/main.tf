@@ -36,18 +36,18 @@ resource "aws_iam_instance_profile" "eb_instance_profile" {
 
 # Create the CloudWatch log group
 resource "aws_cloudwatch_log_group" "eb_logs" {
-  name = "my-flask-app-logs"
+  name = "attrition-app-logs"
 }
 
 # Create the Elastic Beanstalk application
-resource "aws_elastic_beanstalk_application" "my_flask_app" {
-  name = "my-flask-app"
+resource "aws_elastic_beanstalk_application" "attrition-app" {
+  name = "attrition-app"
 }
 
 # Create the Elastic Beanstalk environment
-resource "aws_elastic_beanstalk_environment" "my_flask_app_env" {
-  name                = "my-flask-app-env"
-  application         = aws_elastic_beanstalk_application.my_flask_app.name
+resource "aws_elastic_beanstalk_environment" "attrition-app-env" {
+  name                = "attrition-app-env"
+  application         = aws_elastic_beanstalk_application.attrition-app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
 
   setting {
