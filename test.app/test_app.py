@@ -2,7 +2,7 @@ import requests
 import json
 
 # Set the endpoint URL
-url = "http://10.0.91.30:5010/predict"
+url = "http://10.97.104.174:5010/predict"
 
 # Sample input data
 input_data = {
