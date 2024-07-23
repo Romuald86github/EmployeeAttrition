@@ -25,11 +25,7 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
     value     = var.EC2_KEY_PAIR_NAME
   }
 
-  setting {
-    namespace = "aws:autoscaling:launchconfiguration"
-    name      = "IamInstanceProfile"
-    value     = aws_iam_instance_profile.eb_instance_profile.name
-  }
+  
 
   setting {
     namespace = "aws:ec2:vpc"
