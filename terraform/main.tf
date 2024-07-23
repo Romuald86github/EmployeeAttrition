@@ -2,52 +2,21 @@ provider "aws" {
   region = var.AWS_DEFAULT_REGION
 }
 
-# Create an IAM role for the Elastic Beanstalk environment
-resource "aws_iam_role" "eb_instance_role" {
-  name = "eb-instance-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-# Attach the necessary policies to the IAM role
-resource "aws_iam_role_policy_attachment" "eb_instance_role_policy_attachment" {
-  policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
-  role       = aws_iam_role.eb_instance_role.name
-}
-
-# Create an IAM instance profile and associate it with the IAM role
-resource "aws_iam_instance_profile" "eb_instance_profile" {
-  name = "eb-instance-profile"
-  role = aws_iam_role.eb_instance_role.name
-}
 
 # Create the CloudWatch log group
 resource "aws_cloudwatch_log_group" "eb_logs" {
-  name = "attrition-app-logs"
+  name = "my-flask-app-logs"
 }
 
 # Create the Elastic Beanstalk application
-resource "aws_elastic_beanstalk_application" "attrition-app" {
-  name = "attrition-app"
+resource "aws_elastic_beanstalk_application" "my-flask-app" {
+  name = "my-flask-app"
 }
 
 # Create the Elastic Beanstalk environment
-resource "aws_elastic_beanstalk_environment" "attrition-app-env" {
-  name                = "attrition-app-env"
-  application         = aws_elastic_beanstalk_application.attrition-app.name
+resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
+  name                = "my-flask-app-env"
+  application         = aws_elastic_beanstalk_application.my-flask-app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
 
   setting {
