@@ -7,21 +7,21 @@ def run_streamlit_app():
     st.title("Attrition Prediction App")
 
     # Input features
-    daily_rate = st.number_input("Daily Rate", min_value=0, max_value=100000, step=1)
-    distance_from_home = st.number_input("Distance from Home", min_value=0, max_value=50, step=1)
-    environment_satisfaction = st.selectbox("Environment Satisfaction", options=[1, 2, 3, 4])
-    job_involvement = st.selectbox("Job Involvement", options=[1, 2, 3, 4])
-    job_satisfaction = st.selectbox("Job Satisfaction", options=[1, 2, 3, 4])
-    marital_status = st.selectbox("Marital Status", options=['Single', 'Married', 'Divorced'])
-    num_companies_worked = st.number_input("Number of Companies Worked", min_value=0, max_value=20, step=1)
-    overtime = st.selectbox("Overtime", options=['Yes', 'No'])
-    stock_option_level = st.number_input("Stock Option Level", min_value=0, max_value=3, step=1)
-    total_working_years = st.number_input("Total Working Years", min_value=0, max_value=50, step=1)
-    training_times_last_year = st.number_input("Training Times Last Year", min_value=0, max_value=10, step=1)
-    work_life_balance = st.selectbox("Work-Life Balance", options=[1, 2, 3, 4])
-    years_at_company = st.number_input("Years at Company", min_value=0, max_value=50, step=1)
+    daily_rate = st.number_input("Daily Rate", min_value=0, max_value=100000, step=1, value=0)
+    distance_from_home = st.number_input("Distance from Home", min_value=0, max_value=50, step=1, value=0)
+    environment_satisfaction = st.selectbox("Environment Satisfaction", options=[1, 2, 3, 4], index=0)
+    job_involvement = st.selectbox("Job Involvement", options=[1, 2, 3, 4], index=0)
+    job_satisfaction = st.selectbox("Job Satisfaction", options=[1, 2, 3, 4], index=0)
+    marital_status = st.selectbox("Marital Status", options=['Single', 'Married', 'Divorced'], index=0)
+    num_companies_worked = st.number_input("Number of Companies Worked", min_value=0, max_value=20, step=1, value=0)
+    overtime = st.selectbox("Overtime", options=['Yes', 'No'], index=0)
+    stock_option_level = st.number_input("Stock Option Level", min_value=0, max_value=3, step=1, value=0)
+    total_working_years = st.number_input("Total Working Years", min_value=0, max_value=50, step=1, value=0)
+    training_times_last_year = st.number_input("Training Times Last Year", min_value=0, max_value=10, step=1, value=0)
+    work_life_balance = st.selectbox("Work-Life Balance", options=[1, 2, 3, 4], index=0)
+    years_at_company = st.number_input("Years at Company", min_value=0, max_value=50, step=1, value=0)
 
-    # Create a DataFrame with the input features
+    # Create a dictionary with the input features
     input_data = {
         'DailyRate': daily_rate,
         'DistanceFromHome': distance_from_home,
@@ -40,12 +40,18 @@ def run_streamlit_app():
 
     # Make prediction
     if st.button("Predict"):
-        response = requests.post('http://your-app-url.elasticbeanstalk.com/predict', json=input_data)
-        prediction = response.json()['prediction']
-        if prediction == 0:
-            st.success("The employee is not likely to leave the company.")
-        else:
-            st.error("The employee is likely to leave the company.")
+        try:
+            response = requests.post('http://my-flask-app-env.eba-d6xqtnxr.eu-north-1.elasticbeanstalk.com/predict', json=input_data)
+            response.raise_for_status()
+            prediction = response.json()['prediction']
+            if prediction == 0:
+                st.success("The employee is not likely to leave the company.")
+            else:
+                st.error("The employee is likely to leave the company.")
+        except requests.exceptions.RequestException as e:
+            st.error(f"Error making prediction: {e}")
+        except (ValueError, KeyError):
+            st.error("The Flask app returned an invalid response. Please check the logs.")
 
 if __name__ == "__main__":
     run_streamlit_app()
