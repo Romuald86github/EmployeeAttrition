@@ -2,32 +2,64 @@ provider "aws" {
   region = var.AWS_DEFAULT_REGION
 }
 
-resource "aws_s3_bucket" "model_artifacts" {
-  bucket = var.S3_BUCKET_NAME
-  acl    = "private"
+# Create an IAM role for the Elastic Beanstalk environment
+resource "aws_iam_role" "eb_instance_role" {
+  name = "eb-instance-role"
 
-  versioning {
-    enabled = false
-  }
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
 }
 
+# Attach the necessary policies to the IAM role
+resource "aws_iam_role_policy_attachment" "eb_instance_role_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
+  role       = aws_iam_role.eb_instance_role.name
+}
+
+# Create an IAM instance profile and associate it with the IAM role
+resource "aws_iam_instance_profile" "eb_instance_profile" {
+  name = "eb-instance-profile"
+  role = aws_iam_role.eb_instance_role.name
+}
+
+# Create the CloudWatch log group
 resource "aws_cloudwatch_log_group" "eb_logs" {
-  name = "my-app-logs"
+  name = "my-flask-app-logs"
 }
 
-resource "aws_elastic_beanstalk_application" "my_app" {
-  name = "my-app"
+# Create the Elastic Beanstalk application
+resource "aws_elastic_beanstalk_application" "my_flask_app" {
+  name = "my-flask-app"
 }
 
-resource "aws_elastic_beanstalk_environment" "my_app_env" {
-  name                = "my-app-env"
-  application         = aws_elastic_beanstalk_application.my_app.name
-  solution_stack_name = "64bit Amazon Linux 2 v3.4.6 running Python 3.8"
+# Create the Elastic Beanstalk environment
+resource "aws_elastic_beanstalk_environment" "my_flask_app_env" {
+  name                = "my-flask-app-env"
+  application         = aws_elastic_beanstalk_application.my_flask_app.name
+  solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "EC2KeyName"
     value     = var.EC2_KEY_PAIR_NAME
+  }
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    value     = aws_iam_instance_profile.eb_instance_profile.name
   }
 
   setting {
@@ -43,27 +75,15 @@ resource "aws_elastic_beanstalk_environment" "my_app_env" {
   }
 
   setting {
-    namespace = "aws:elasticbeanstalk:environment"
-    name      = "ContainerPort"
-    value     = "5010"
+    namespace = "aws:elasticbeanstalk:environment:proxy"
+    name      = "ProxyServer"
+    value     = "nginx"
   }
 
   setting {
-    namespace = "aws:elasticbeanstalk:environment"
-    name      = "DockerRunArgs"
-    value     = "-p 5010:5010"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:environment"
-    name      = "DockerConfigurationSource"
-    value     = "DockerRunArgs"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:environment"
-    name      = "DockerRunImage"
-    value     = var.DOCKER_IMAGE_URL
+    namespace = "aws:elasticbeanstalk:environment:proxy:staticfiles"
+    name      = "/static/"
+    value     = "/var/app/current/static/"
   }
 
   setting {
@@ -82,5 +102,11 @@ resource "aws_elastic_beanstalk_environment" "my_app_env" {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "S3_BUCKET_NAME"
     value     = var.S3_BUCKET_NAME
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DOCKER_IMAGE_URL"
+    value     = var.DOCKER_IMAGE_URL
   }
 }
