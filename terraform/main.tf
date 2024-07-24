@@ -39,7 +39,13 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
   setting {
     namespace = "aws:ec2:vpc"
     name      = "Subnets"
-    value     = var.SUBNET_IDS
+    value     = join(",", var.SUBNET_IDS)
+  }
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "SecurityGroups"
+    value     = join(",", ["sg-0778ad3fdfff53e4c", "sg-08297c0c15468f5c2"])
   }
 
   setting {
@@ -94,5 +100,17 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "ServiceRole"
     value     = data.aws_iam_role.eb_service_role.arn
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "EnvironmentType"
+    value     = "LoadBalanced"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "HEALTHCHECK_URL"
+    value     = "/"
   }
 }
