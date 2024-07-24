@@ -87,6 +87,11 @@ data "aws_iam_role" "eb_service_role" {
   name = "eb-service-role"
 }
 
+# Use the existing IAM instance profile for Elastic Beanstalk
+data "aws_iam_instance_profile" "eb_instance_profile" {
+  name = "eb-instance-profile"
+}
+
 # Create the Elastic Beanstalk application (if it doesn't exist)
 resource "aws_elastic_beanstalk_application" "my-flask-app" {
   name = "my-flask-app"
@@ -107,7 +112,7 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
-    value     = aws_iam_instance_profile.eb_instance_profile.id
+    value     = data.aws_iam_instance_profile.eb_instance_profile.id
   }
 
   setting {
