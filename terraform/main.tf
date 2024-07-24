@@ -79,6 +79,18 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
   }
 
   setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "EC2_KEY_PAIR_PATH"
+    value     = var.EC2_KEY_PAIR_PATH
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "AWS_ACCOUNT_ID"
+    value     = var.AWS_ACCOUNT_ID
+  }
+
+  setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "ServiceRole"
     value     = data.aws_iam_role.eb_service_role.arn

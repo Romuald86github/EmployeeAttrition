@@ -9,6 +9,11 @@ variable "EC2_KEY_PAIR_NAME" {
   type        = string
 }
 
+variable "EC2_KEY_PAIR_PATH" {
+  description = "Path to the EC2 key pair file to use for the Elastic Beanstalk environment"
+  type        = string
+}
+
 variable "VPC_ID" {
   description = "ID of the VPC to use for the Elastic Beanstalk environment"
   type        = string
@@ -38,4 +43,9 @@ variable "S3_BUCKET_NAME" {
   description = "Name of the S3 bucket for model artifacts"
   type        = string
   default     = "attritionproject"
+}
+
+variable "AWS_ACCOUNT_ID" {
+  description = "AWS Account ID for the ECR repository"
+  type        = string
 }
