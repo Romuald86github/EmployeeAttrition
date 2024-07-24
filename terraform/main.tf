@@ -3,11 +3,6 @@ provider "aws" {
 }
 
 
-# Create the CloudWatch log group
-resource "aws_cloudwatch_log_group" "eb_logs" {
-  name = "my-flask-app-logs"
-}
-
 # Create the Elastic Beanstalk application
 resource "aws_elastic_beanstalk_application" "my-flask-app" {
   name = "my-flask-app"
