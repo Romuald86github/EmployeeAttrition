@@ -9,11 +9,6 @@ variable "EC2_KEY_PAIR_NAME" {
   type        = string
 }
 
-variable "EC2_KEY_PAIR_PATH" {
-  description = "Path to the EC2 key pair file to use for the Elastic Beanstalk environment"
-  type        = string
-}
-
 variable "VPC_ID" {
   description = "ID of the VPC to use for the Elastic Beanstalk environment"
   type        = string
@@ -36,11 +31,6 @@ variable "AWS_ACCESS_KEY_ID" {
 
 variable "AWS_SECRET_ACCESS_KEY" {
   description = "AWS Secret Access Key for the Flask app to access S3"
-  type        = string
-}
-
-variable "AWS_ACCOUNT_ID" {
-  description = "AWS Account ID for the ECR repository"
   type        = string
 }
 

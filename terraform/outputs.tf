@@ -10,5 +10,5 @@ output "elastic_beanstalk_environment_name" {
 
 output "elastic_beanstalk_environment_url" {
   description = "URL of the Elastic Beanstalk environment"
-  value       = aws_elastic_beanstalk_environment.my-flask-app-env.cname
+  value       = aws_elastic_beanstalk_environment.my-flask-app-env.endpoint_url
 }
