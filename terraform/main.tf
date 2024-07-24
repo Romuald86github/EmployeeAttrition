@@ -17,7 +17,6 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
   name                = "my-flask-app-env"
   application         = aws_elastic_beanstalk_application.my-flask-app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
-  service_role        = data.aws_iam_role.eb_service_role.arn
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
@@ -77,5 +76,11 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DOCKER_IMAGE_URL"
     value     = var.DOCKER_IMAGE_URL
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "ServiceRole"
+    value     = data.aws_iam_role.eb_service_role.arn
   }
 }
