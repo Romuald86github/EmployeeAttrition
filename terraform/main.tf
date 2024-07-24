@@ -8,14 +8,14 @@ data "aws_iam_role" "eb_service_role" {
 }
 
 # Create the Elastic Beanstalk application (if it doesn't exist)
-resource "aws_elastic_beanstalk_application" "my_flask_app" {
+resource "aws_elastic_beanstalk_application" "my-flask-app" {
   name = "my-flask-app"
 }
 
 # Create the Elastic Beanstalk environment
-resource "aws_elastic_beanstalk_environment" "my_flask_app_env" {
+resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
   name                = "my-flask-app-env"
-  application         = aws_elastic_beanstalk_application.my_flask_app.name
+  application         = aws_elastic_beanstalk_application.my-flask-app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
   service_role        = data.aws_iam_role.eb_service_role.name
 
