@@ -21,11 +21,6 @@ variable "VPC_ID" {
   default     = "vpc-05cdca43df7e9fab8"
 }
 
-variable "SUBNET_IDS" {
-  description = "List of subnet IDs to use for the Elastic Beanstalk environment"
-  type        = list(string)
-}
-
 variable "DOCKER_IMAGE_URL" {
   description = "URL of the Docker image to use for the Elastic Beanstalk environment"
   type        = string
