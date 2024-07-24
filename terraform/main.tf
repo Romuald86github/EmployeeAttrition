@@ -2,43 +2,22 @@ provider "aws" {
   region = var.AWS_DEFAULT_REGION
 }
 
-
-# Create the IAM service role for Elastic Beanstalk
-resource "aws_iam_role" "eb_service_role" {
+# Use the existing IAM service role for Elastic Beanstalk
+data "aws_iam_role" "eb_service_role" {
   name = "eb-service-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "elasticbeanstalk.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
 }
 
-# Attach the necessary policies to the IAM service role
-resource "aws_iam_role_policy_attachment" "eb_service_role_policy_attachment" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
-  role       = aws_iam_role.eb_service_role.name
-}
-
-# Create the Elastic Beanstalk application
-resource "aws_elastic_beanstalk_application" "my-flask-app" {
+# Create the Elastic Beanstalk application (if it doesn't exist)
+resource "aws_elastic_beanstalk_application" "my_flask_app" {
   name = "my-flask-app"
 }
 
 # Create the Elastic Beanstalk environment
-resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
+resource "aws_elastic_beanstalk_environment" "my_flask_app_env" {
   name                = "my-flask-app-env"
-  application         = aws_elastic_beanstalk_application.my-flask-app.name
+  application         = aws_elastic_beanstalk_application.my_flask_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
+  service_role        = data.aws_iam_role.eb_service_role.name
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
@@ -46,7 +25,6 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
     value     = var.EC2_KEY_PAIR_NAME
   }
 
-  
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
