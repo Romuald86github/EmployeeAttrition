@@ -7,7 +7,6 @@ variable "AWS_DEFAULT_REGION" {
 variable "EC2_KEY_PAIR_NAME" {
   description = "Name of the EC2 key pair to use for the Elastic Beanstalk environment"
   type        = string
-  default     = "WRomyAS"
 }
 
 variable "EC2_KEY_PAIR_PATH" {
@@ -19,6 +18,12 @@ variable "VPC_ID" {
   description = "ID of the VPC to use for the Elastic Beanstalk environment"
   type        = string
   default     = "vpc-05cdca43df7e9fab8"
+}
+
+variable "SUBNET_IDS" {
+  description = "List of subnet IDs to use for the Elastic Beanstalk environment"
+  type        = list(string)
+  default     = ["subnet-0c0e72ee4a3b9d28c", "subnet-0824deee3cf53543e", "subnet-0c44526c62d185c59"]
 }
 
 variable "DOCKER_IMAGE_URL" {
