@@ -3,6 +3,32 @@ provider "aws" {
 }
 
 
+# Create the IAM service role for Elastic Beanstalk
+resource "aws_iam_role" "eb_service_role" {
+  name = "eb-service-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "elasticbeanstalk.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# Attach the necessary policies to the IAM service role
+resource "aws_iam_role_policy_attachment" "eb_service_role_policy_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
+  role       = aws_iam_role.eb_service_role.name
+}
+
 # Create the Elastic Beanstalk application
 resource "aws_elastic_beanstalk_application" "my-flask-app" {
   name = "my-flask-app"
