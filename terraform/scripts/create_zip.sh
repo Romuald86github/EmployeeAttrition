@@ -4,7 +4,7 @@
 cd ../
 
 # Zip the application files
-zip -r terraform/app.zip app/
+zip -r terraform/app.zip . -i app/
 
 # Navigate back to the terraform/scripts directory
 cd terraform/scripts
