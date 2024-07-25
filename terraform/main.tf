@@ -12,6 +12,11 @@ data "aws_s3_bucket" "app_bucket" {
   bucket = var.S3_BUCKET_NAME
 }
 
+# Data source for existing IAM instance profile
+data "aws_iam_instance_profile" "eb_instance_profile" {
+  name = "eb-instance-profile"
+}
+
 # Upload the application zip file to S3
 resource "aws_s3_bucket_object" "flask_app" {
   bucket = data.aws_s3_bucket.app_bucket.bucket
@@ -62,7 +67,7 @@ resource "aws_elastic_beanstalk_environment" "attrition_env" {
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "InstanceProfile"
-    value     = aws_iam_instance_profile.eb_instance_profile.arn
+    value     = data.aws_iam_instance_profile.eb_instance_profile.arn
   }
 
   setting {
@@ -73,10 +78,4 @@ resource "aws_elastic_beanstalk_environment" "attrition_env" {
 
   version_label = aws_elastic_beanstalk_application_version.attrition_app_version.name
   depends_on    = [aws_s3_bucket_object.flask_app]
-}
-
-# Create an IAM Instance Profile
-resource "aws_iam_instance_profile" "eb_instance_profile" {
-  name = "eb-instance-profile"
-  role = data.aws_iam_role.eb_service_role.name
 }
