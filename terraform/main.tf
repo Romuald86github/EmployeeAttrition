@@ -2,38 +2,33 @@ provider "aws" {
   region = var.AWS_DEFAULT_REGION
 }
 
-# Use the existing IAM service role for Elastic Beanstalk
-data "aws_iam_role" "eb_service_role" {
-  name = "eb-service-role"
-}
-
-resource "aws_s3_bucket" "app_bucket" {
-  bucket = var.S3_BUCKET_NAME
-  acl    = "private"
+# Use the existing S3 bucket
+data "aws_s3_bucket" "app_bucket" {
+  bucket = "attritionproject"
 }
 
 resource "aws_s3_bucket_object" "flask_app" {
-  bucket = aws_s3_bucket.app_bucket.bucket
+  bucket = data.aws_s3_bucket.app_bucket.bucket
   key    = "flask_app.zip"
-  source = "${path.module}/app.zip"  # The zip file created by the script
+  source = "${path.module}/app.zip"
 }
 
-resource "aws_elastic_beanstalk_application" "flask_app" {
-  name        = "my-flask-app"
-  description = "Flask application"
+# Use the existing Elastic Beanstalk application
+data "aws_elastic_beanstalk_application" "flask_app" {
+  name = "attrition-app"
 }
 
 resource "aws_elastic_beanstalk_application_version" "flask_app_version" {
-  name        = "flask-app-version"
-  application = aws_elastic_beanstalk_application.flask_app.name
-  bucket      = aws_s3_bucket.app_bucket.bucket
+  name        = "attrition-app-version"
+  application = data.aws_elastic_beanstalk_application.flask_app.name
+  bucket      = data.aws_s3_bucket.app_bucket.bucket
   key         = "flask_app.zip"
-  description = "Version of Flask app"
+  description = "Version of Attrition app"
 }
 
 resource "aws_elastic_beanstalk_environment" "flask_env" {
-  name                = "my-flask-app-env"
-  application         = aws_elastic_beanstalk_application.flask_app.name
+  name                = "attrition-app-env"
+  application         = data.aws_elastic_beanstalk_application.flask_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
 
   setting {
@@ -130,38 +125,23 @@ resource "aws_elastic_beanstalk_environment" "flask_env" {
   depends_on    = [aws_s3_bucket_object.flask_app]
 }
 
-resource "aws_iam_policy" "eb_instance_profile_policy" {
-  name        = "eb-instance-profile-policy"
-  description = "Policy for EC2 instances in Elastic Beanstalk environment"
-  policy      = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          "arn:aws:s3:::${var.S3_BUCKET_NAME}/*",
-          "arn:aws:s3:::${var.S3_BUCKET_NAME}"
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
+# Use the existing IAM service role for Elastic Beanstalk
+data "aws_iam_role" "eb_service_role" {
+  name = "eb-service-role"
 }
 
+# Attach existing policies to the IAM role
 resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment" {
   role       = data.aws_iam_role.eb_service_role.name
-  policy_arn = aws_iam_policy.eb_instance_profile_policy.arn
+  policy_arn = "arn:aws:iam::662479519742:policy/eb-instance-profile-policy"
+}
+
+resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment2" {
+  role       = data.aws_iam_role.eb_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth"
+}
+
+resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment3" {
+  role       = data.aws_iam_role.eb_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkMulticontainerDocker"
 }
