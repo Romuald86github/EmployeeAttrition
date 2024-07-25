@@ -1,53 +1,29 @@
 variable "AWS_DEFAULT_REGION" {
-  description = "AWS default region"
-  type        = string
-  default     = "eu-north-1"
+  description = "The AWS region to deploy resources into"
+  default     = "eu-north-1"  # Stockholm region
 }
 
-variable "EC2_KEY_PAIR_NAME" {
-  description = "Name of the EC2 key pair to use for the Elastic Beanstalk environment"
-  type        = string
-}
-
-variable "EC2_KEY_PAIR_PATH" {
-  description = "Path to the EC2 key pair file to use for the Elastic Beanstalk environment"
-  type        = string
-}
-
-variable "VPC_ID" {
-  description = "ID of the VPC to use for the Elastic Beanstalk environment"
-  type        = string
-  default     = "vpc-05cdca43df7e9fab8"
-}
-
-variable "SUBNET_IDS" {
-  description = "List of subnet IDs to use for the Elastic Beanstalk environment"
-  type        = list(string)
-  default     = ["subnet-0c0e72ee4a3b9d28c", "subnet-0824deee3cf53543e", "subnet-0c44526c62d185c59"]
-}
-
-variable "DOCKER_IMAGE_URL" {
-  description = "URL of the Docker image to use for the Elastic Beanstalk environment"
-  type        = string
+variable "S3_BUCKET_NAME" {
+  description = "The name of the S3 bucket for storing the application package"
+  default     = "attritionproject"
 }
 
 variable "AWS_ACCESS_KEY_ID" {
-  description = "AWS Access Key ID for the Flask app to access S3"
+  description = "The AWS access key ID"
   type        = string
 }
 
 variable "AWS_SECRET_ACCESS_KEY" {
-  description = "AWS Secret Access Key for the Flask app to access S3"
+  description = "The AWS secret access key"
   type        = string
 }
 
-variable "S3_BUCKET_NAME" {
-  description = "Name of the S3 bucket for model artifacts"
+variable "DOCKER_IMAGE_URL" {
+  description = "The URL of the Docker image"
   type        = string
-  default     = "attritionproject"
 }
 
 variable "AWS_ACCOUNT_ID" {
-  description = "AWS Account ID for the ECR repository"
+  description = "The AWS account ID"
   type        = string
 }

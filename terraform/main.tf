@@ -7,41 +7,34 @@ data "aws_iam_role" "eb_service_role" {
   name = "eb-service-role"
 }
 
-# Create the Elastic Beanstalk application (if it doesn't exist)
-resource "aws_elastic_beanstalk_application" "my-flask-app" {
-  name = "my-flask-app"
+resource "aws_s3_bucket" "app_bucket" {
+  bucket = var.S3_BUCKET_NAME
+  acl    = "private"
 }
 
-# Create the Elastic Beanstalk environment
-resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
+resource "aws_s3_bucket_object" "flask_app" {
+  bucket = aws_s3_bucket.app_bucket.bucket
+  key    = "flask_app.zip"
+  source = "../app.zip"  # The zip file created by the script
+}
+
+resource "aws_elastic_beanstalk_application" "flask_app" {
+  name        = "my-flask-app"
+  description = "Flask application"
+}
+
+resource "aws_elastic_beanstalk_application_version" "flask_app_version" {
+  name        = "flask-app-version"
+  application = aws_elastic_beanstalk_application.flask_app.name
+  bucket      = aws_s3_bucket.app_bucket.bucket
+  key         = "flask_app.zip"
+  description = "Version of Flask app"
+}
+
+resource "aws_elastic_beanstalk_environment" "flask_env" {
   name                = "my-flask-app-env"
-  application         = aws_elastic_beanstalk_application.my-flask-app.name
+  application         = aws_elastic_beanstalk_application.flask_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
-
-  setting {
-    namespace = "aws:autoscaling:launchconfiguration"
-    name      = "EC2KeyName"
-    value     = var.EC2_KEY_PAIR_NAME
-  }
-
-  setting {
-    namespace = "aws:autoscaling:launchconfiguration"
-    name      = "IamInstanceProfile"
-    value     = "eb-instance-profile"
-  }
-
-  setting {
-    namespace = "aws:ec2:vpc"
-    name      = "VPCId"
-    value     = var.VPC_ID
-  }
-
-  setting {
-    namespace = "aws:ec2:vpc"
-    name      = "Subnets"
-    value     = join(",", var.SUBNET_IDS)
-  }
-
 
   setting {
     namespace = "aws:elasticbeanstalk:environment:proxy"
@@ -69,6 +62,12 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "AWS_DEFAULT_REGION"
+    value     = var.AWS_DEFAULT_REGION
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
     name      = "S3_BUCKET_NAME"
     value     = var.S3_BUCKET_NAME
   }
@@ -77,12 +76,6 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DOCKER_IMAGE_URL"
     value     = var.DOCKER_IMAGE_URL
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "EC2_KEY_PAIR_PATH"
-    value     = var.EC2_KEY_PAIR_PATH
   }
 
   setting {
@@ -108,4 +101,43 @@ resource "aws_elastic_beanstalk_environment" "my-flask-app-env" {
     name      = "HEALTHCHECK_URL"
     value     = "/"
   }
+
+  version_label = aws_elastic_beanstalk_application_version.flask_app_version.name
+  depends_on    = [aws_s3_bucket_object.flask_app]
+}
+
+resource "aws_iam_policy" "eb_instance_profile_policy" {
+  name        = "eb-instance-profile-policy"
+  description = "Policy for EC2 instances in Elastic Beanstalk environment"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.S3_BUCKET_NAME}/*",
+          "arn:aws:s3:::${var.S3_BUCKET_NAME}"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment" {
+  role       = data.aws_iam_role.eb_service_role.name
+  policy_arn = aws_iam_policy.eb_instance_profile_policy.arn
 }

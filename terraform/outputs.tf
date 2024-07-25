@@ -1,14 +1,15 @@
-output "s3_bucket_name" {
-  description = "Name of the S3 bucket for model artifacts"
-  value       = var.S3_BUCKET_NAME
+output "application_name" {
+  value = aws_elastic_beanstalk_application.flask_app.name
 }
 
-output "elastic_beanstalk_environment_name" {
-  description = "Name of the Elastic Beanstalk environment"
-  value       = aws_elastic_beanstalk_environment.my-flask-app-env.name
+output "environment_name" {
+  value = aws_elastic_beanstalk_environment.flask_env.name
 }
 
-output "elastic_beanstalk_environment_url" {
-  description = "URL of the Elastic Beanstalk environment"
-  value       = aws_elastic_beanstalk_environment.my-flask-app-env.endpoint_url
+output "application_version" {
+  value = aws_elastic_beanstalk_application_version.flask_app_version.name
+}
+
+output "endpoint_url" {
+  value = aws_elastic_beanstalk_environment.flask_env.endpoint_url
 }
