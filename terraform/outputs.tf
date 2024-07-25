@@ -1,11 +1,11 @@
 output "application_name" {
-  value = data.aws_elastic_beanstalk_application.flask_app.name
+  value = aws_elastic_beanstalk_application.attrition_app.name
 }
 
 output "environment_name" {
-  value = aws_elastic_beanstalk_environment.flask_env.name
+  value = aws_elastic_beanstalk_environment.attrition_env.name
 }
 
-output "application_version" {
-  value = aws_elastic_beanstalk_application_version.flask_app_version.name
+output "s3_bucket" {
+  value = data.aws_s3_bucket.app_bucket.bucket
 }
