@@ -44,13 +44,25 @@ resource "aws_elastic_beanstalk_environment" "attrition_env" {
   setting {
     namespace = "aws:elasticbeanstalk:container:python"
     name      = "WsgiPath"
-    value     = "app.app"  # Adjust based on your WSGI app entry point
+    value     = "app:app"  # Adjust based on your Gunicorn WSGI app entry point
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:container:python"
+    name      = "NumWorkers"
+    value     = "3"  # Number of Gunicorn workers
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:container:python"
+    name      = "GunicornApp"
+    value     = "app:app"  # Adjust based on your Gunicorn WSGI app entry point
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:environment"
-    name      = "ServiceRole"
-    value     = data.aws_iam_role.eb_service_role.arn
+    name      = "InstanceProfile"
+    value     = aws_iam_instance_profile.eb_instance_profile.arn
   }
 
   setting {
@@ -63,18 +75,8 @@ resource "aws_elastic_beanstalk_environment" "attrition_env" {
   depends_on    = [aws_s3_bucket_object.flask_app]
 }
 
-# Attach existing policies to the IAM role
-resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment" {
-  role       = data.aws_iam_role.eb_service_role.name
-  policy_arn = "arn:aws:iam::662479519742:policy/IAMPolicy"  # Attach IAMPolicy
-}
-
-resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment2" {
-  role       = data.aws_iam_role.eb_service_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth"
-}
-
-resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment3" {
-  role       = data.aws_iam_role.eb_service_role.name
-  policy_arn = "arn:aws:iam::662479519742:policy/ServiceRolePolicy"  # Attach ServiceRolePolicy
+# Create an IAM Instance Profile
+resource "aws_iam_instance_profile" "eb_instance_profile" {
+  name = "eb-instance-profile"
+  role = data.aws_iam_role.eb_service_role.name
 }
