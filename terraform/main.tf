@@ -15,7 +15,7 @@ resource "aws_s3_bucket" "app_bucket" {
 resource "aws_s3_bucket_object" "flask_app" {
   bucket = aws_s3_bucket.app_bucket.bucket
   key    = "flask_app.zip"
-  source = "../app.zip"  # The zip file created by the script
+  source = "${path.module}/app.zip"  # The zip file created by the script
 }
 
 resource "aws_elastic_beanstalk_application" "flask_app" {
@@ -100,6 +100,30 @@ resource "aws_elastic_beanstalk_environment" "flask_env" {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "HEALTHCHECK_URL"
     value     = "/"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:container:docker"
+    name      = "DockerRunCommand"
+    value     = "docker run -p 5010:5010 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION $DOCKER_IMAGE_URL"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:container:docker"
+    name      = "DockerImage"
+    value     = var.DOCKER_IMAGE_URL
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerType"
+    value     = "application"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:container:docker"
+    name      = "DockerFile"
+    value     = "../src/app/Dockerfile"
   }
 
   version_label = aws_elastic_beanstalk_application_version.flask_app_version.name
