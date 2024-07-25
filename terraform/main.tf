@@ -39,12 +39,12 @@ resource "aws_elastic_beanstalk_application_version" "attrition_app_version" {
 resource "aws_elastic_beanstalk_environment" "attrition_env" {
   name                = "attrition-app-env"
   application         = aws_elastic_beanstalk_application.attrition_app.name
-  solution_stack_name = "64bit Amazon Linux 2 v3.3.6 running Docker"
+  solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
 
   setting {
-    namespace = "aws:elasticbeanstalk:container:docker"
-    name      = "DockerImage"
-    value     = "my-flask-app:latest"  # Docker image tag
+    namespace = "aws:elasticbeanstalk:container:python"
+    name      = "WsgiPath"
+    value     = "app.app"  # Adjust based on your WSGI app entry point
   }
 
   setting {
@@ -66,7 +66,7 @@ resource "aws_elastic_beanstalk_environment" "attrition_env" {
 # Attach existing policies to the IAM role
 resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment" {
   role       = data.aws_iam_role.eb_service_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  policy_arn = "arn:aws:iam::662479519742:policy/IAMPolicy"  # Attach IAMPolicy
 }
 
 resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment2" {
@@ -76,5 +76,5 @@ resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment
 
 resource "aws_iam_role_policy_attachment" "eb_instance_profile_policy_attachment3" {
   role       = data.aws_iam_role.eb_service_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkMulticontainerDocker"
+  policy_arn = "arn:aws:iam::662479519742:policy/ServiceRolePolicy"  # Attach ServiceRolePolicy
 }
