@@ -18,6 +18,9 @@ __pycache__/
 # Ignore sensitive variable files
 terraform.tfvars
 
+# ignore terraformlock
+.terraform.lock.hcl
+
 # Ignore large files (greater than 100MB)
 *.pkl
 *.h5
