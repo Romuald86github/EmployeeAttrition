@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Create application zip file
-./create_zip.sh
+#!/bin/bash
+
+# Navigate to the terraform directory
+cd ../terraform
 
 # Initialize Terraform
 terraform init
