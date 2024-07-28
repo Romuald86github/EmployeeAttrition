@@ -10,8 +10,8 @@ data "aws_iam_role" "eb_service_role" {
 }
 
 # Create the Elastic Beanstalk application (if it doesn't exist)
-resource "aws_elastic_beanstalk_application" "attrition-app" {
-  name = "attrition-app"
+resource "aws_elastic_beanstalk_application" "attrition-app1" {
+  name = "attrition-app1"
 }
 
 # Read the application ZIP file content
@@ -28,9 +28,9 @@ resource "aws_s3_object" "app_zip" {
 }
 
 # Create the Elastic Beanstalk environment
-resource "aws_elastic_beanstalk_environment" "attrition-app-env" {
-  name                = "attrition-app-env"
-  application         = aws_elastic_beanstalk_application.attrition-app.name
+resource "aws_elastic_beanstalk_environment" "attrition-app1-env" {
+  name                = "attrition-app1-env"
+  application         = aws_elastic_beanstalk_application.attrition-app1.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.1.1 running Python 3.9"
 
   setting {
