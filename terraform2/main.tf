@@ -12,12 +12,17 @@ resource "aws_elastic_beanstalk_application" "attrition-app" {
   name = "attrition-app"
 }
 
+# Read the application ZIP file content
+data "local_file" "app_zip" {
+  filename = "${path.module}/${var.zip_file}"
+}
+
 # Upload the application ZIP file to S3
-data "aws_s3_object" "app_zip" {
+resource "aws_s3_object" "app_zip" {
   bucket = var.S3_BUCKET_NAME
   key    = var.zip_file
-  source = file("${path.module}/${var.zip_file}")
-  etag   = filemd5("${path.module}/${var.zip_file}")
+  source = data.local_file.app_zip.filename
+  etag   = filemd5(data.local_file.app_zip.filename)
 }
 
 # Create the Elastic Beanstalk environment
