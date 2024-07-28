@@ -2,6 +2,8 @@ provider "aws" {
   region = var.AWS_DEFAULT_REGION
 }
 
+provider "local" {}
+
 # Use the existing IAM service role for Elastic Beanstalk
 data "aws_iam_role" "eb_service_role" {
   name = "eb-service-role"
