@@ -15,13 +15,13 @@ variable "zip_file" {
 variable "VPC_ID" {
   description = "ID of the VPC to use for the Elastic Beanstalk environment"
   type        = string
-  default     = "vpc-0ac921d85af3ae817"
+  default     = "vpc-05cdca43df7e9fab8"
 }
 
 variable "SUBNET_IDS" {
   description = "List of subnet IDs to use for the Elastic Beanstalk environment"
   type        = list(string)
-  default     = ["subnet-0cccea6d8d90c6ca4", "subnet-06bfe56fa33ee2c77", "subnet-007b6d0e0ed2fb339"]
+  default     = ["subnet-0824deee3cf53543e", "subnet-0c44526c62d185c59", "subnet-0c0e72ee4a3b9d28c"]
 }
 
 variable "DOCKER_IMAGE_URL" {
