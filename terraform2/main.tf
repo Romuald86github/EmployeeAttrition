@@ -16,7 +16,7 @@ resource "aws_elastic_beanstalk_application" "attrition-app" {
 data "aws_s3_bucket_object" "app_zip" {
   bucket = var.S3_BUCKET_NAME
   key    = var.zip_file
-  source = "${path.module}/${var.zip_file}"
+  source = file("${path.module}/${var.zip_file}")
 }
 
 # Create the Elastic Beanstalk environment
