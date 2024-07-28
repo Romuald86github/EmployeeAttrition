@@ -13,7 +13,7 @@ resource "aws_elastic_beanstalk_application" "attrition-app" {
 }
 
 # Upload the application ZIP file to S3
-data "aws_s3_bucket_object" "app_zip" {
+data "aws_s3_object" "app_zip" {
   bucket = var.S3_BUCKET_NAME
   key    = var.zip_file
   source = file("${path.module}/${var.zip_file}")
