@@ -69,11 +69,6 @@ resource "aws_elastic_beanstalk_environment" "attrition-app1-env" {
     value     = "/var/app/current/app.py"
   }
 
-  setting {
-    namespace = "aws:elasticbeanstalk:container:python"
-    name      = "WSGIServer"
-    value     = "gunicorn"
-  }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
