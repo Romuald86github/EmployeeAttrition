@@ -10,8 +10,8 @@ COPY requirements.txt .
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the Flask app code
-COPY . .
+# Copy the Flask app code (only app.py)
+COPY app.py .
 
 # Expose the port your Flask app is running on
 EXPOSE 5010
