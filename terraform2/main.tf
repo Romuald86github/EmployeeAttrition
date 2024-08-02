@@ -61,7 +61,7 @@ resource "aws_elastic_beanstalk_environment" "attrition-app1-env" {
   setting {
     namespace = "aws:elasticbeanstalk:container:python"
     name      = "WSGIPath"
-    value     = "/var/app/current/app.py"
+    value     = "/var/app/current/application.py"
   }
 
 

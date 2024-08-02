@@ -10,11 +10,11 @@ COPY requirements.txt .
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the Flask app code (only app.py)
-COPY app.py .
+# Copy the Flask app code (entire app directory)
+COPY app /app
 
 # Expose the port your Flask app is running on
 EXPOSE 5010
 
 # Set the command to run your Flask app using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5010", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5010", "application:app"]
