@@ -45,9 +45,6 @@ s3_client.download_file(bucket_name, f"{artifact_path}/preprocessing_pipeline.pk
 with open(local_pipeline_path, 'rb') as f:
     preprocessing_pipeline = pickle.load(f)
 
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('static', filename)
 
 @app.route('/predict', methods=['POST'])
 def predict():
