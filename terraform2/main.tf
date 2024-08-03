@@ -14,17 +14,12 @@ resource "aws_elastic_beanstalk_application" "attrition-app1" {
   name = "attrition-app1"
 }
 
-# Read the application ZIP file content
-data "local_file" "app_zip" {
-  filename = "${path.module}/${var.zip_file}"
-}
-
-# Upload the application ZIP file to S3
-resource "aws_s3_object" "app_zip" {
-  bucket = var.S3_BUCKET_NAME
-  key    = var.zip_file
-  source = data.local_file.app_zip.filename
-  etag   = filemd5(data.local_file.app_zip.filename)
+# Define the Elastic Beanstalk application version
+resource "aws_elastic_beanstalk_application_version" "attrition-app1-version" {
+  name        = "attrition-app1-version-${timestamp()}"
+  application = aws_elastic_beanstalk_application.attrition-app1.name
+  bucket      = var.S3_BUCKET_NAME
+  key         = var.zip_file
 }
 
 # Create the Elastic Beanstalk environment
@@ -56,7 +51,6 @@ resource "aws_elastic_beanstalk_environment" "attrition-app1-env" {
     name      = "ProxyServer"
     value     = "nginx"
   }
-
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
@@ -105,4 +99,6 @@ resource "aws_elastic_beanstalk_environment" "attrition-app1-env" {
     name      = "HEALTHCHECK_URL"
     value     = "/"
   }
+
+  version_label = aws_elastic_beanstalk_application_version.attrition-app1-version.name
 }
