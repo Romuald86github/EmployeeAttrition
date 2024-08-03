@@ -5,13 +5,6 @@ variable "AWS_DEFAULT_REGION" {
 }
 
 
-variable "zip_file" {
-  description = "The path to the application zip file"
-  type        = string
-  default     = "app.zip"
-}
-
-
 
 variable "VPC_ID" {
   description = "ID of the VPC to use for the Elastic Beanstalk environment"
