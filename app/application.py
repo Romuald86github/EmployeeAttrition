@@ -1,12 +1,12 @@
 import os
 import mlflow
 import mlflow.sklearn
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 import pandas as pd
 import boto3
 import pickle
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Set up AWS credentials
 aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
@@ -46,6 +46,11 @@ with open(local_pipeline_path, 'rb') as f:
     preprocessing_pipeline = pickle.load(f)
 
 
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
@@ -53,6 +58,7 @@ def predict():
     X_preprocessed = preprocessing_pipeline.transform(df)
     prediction = model.predict(X_preprocessed)
     return jsonify({'prediction': int(prediction[0])})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5010)
