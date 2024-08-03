@@ -18,8 +18,8 @@ resource "aws_elastic_beanstalk_application" "attrition-app1" {
 resource "aws_elastic_beanstalk_application_version" "attrition-app1-version" {
   name        = "attrition-app1-version-${timestamp()}"
   application = aws_elastic_beanstalk_application.attrition-app1.name
-  bucket      = var.S3_BUCKET_NAME
-  key         = var.zip_file
+  bucket      = "attritionproject"
+  key         = "app.zip"
 }
 
 # Create the Elastic Beanstalk environment
