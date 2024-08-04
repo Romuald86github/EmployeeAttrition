@@ -20,12 +20,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd EmployeeAttrition/deployment/app
+          cd deployment/app
           pip install -r requirements.txt
 
       - name: Zip the deployment directory
         run: |
-          cd EmployeeAttrition/deployment
+          cd deployment
           zip -r app.zip app/ .ebextensions/
 
       - name: Configure AWS Credentials
@@ -37,7 +37,7 @@ jobs:
 
       - name: Upload app.zip to S3
         run: |
-          aws s3 cp EmployeeAttrition/deployment/app.zip s3://${{ secrets.S3_BUCKET_NAME }}/app.zip
+          aws s3 cp deployment/app.zip s3://${{ secrets.S3_BUCKET_NAME }}/app.zip
 
       - name: Create new Elastic Beanstalk application version
         run: |
