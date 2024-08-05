@@ -1,0 +1,36 @@
+name: Deploy Streamlit App
+
+on:
+  push:
+    branches:
+      - main  # Adjust if you use a different branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      - name: Set up environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          cd streamlit  # Change to the directory where your Streamlit app is located
+          pip install -r requirements.txt
+
+      - name: Run Streamlit app
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          source venv/bin/activate
+          cd streamlit  # Change to the directory where your Streamlit app is located
+          streamlit run application.py
