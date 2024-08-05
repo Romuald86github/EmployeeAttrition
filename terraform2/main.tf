@@ -65,12 +65,6 @@ resource "aws_elastic_beanstalk_environment" "attrition-app1-env" {
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DOCKER_IMAGE_URL"
-    value     = var.DOCKER_IMAGE_URL
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
     name      = "AWS_ACCOUNT_ID"
     value     = var.AWS_ACCOUNT_ID
   }

@@ -18,10 +18,6 @@ variable "SUBNET_IDS" {
   default     = ["subnet-0824deee3cf53543e", "subnet-0c44526c62d185c59", "subnet-0c0e72ee4a3b9d28c"]
 }
 
-variable "DOCKER_IMAGE_URL" {
-  description = "URL of the Docker image to use for the Elastic Beanstalk environment"
-  type        = string
-}
 
 variable "AWS_ACCESS_KEY_ID" {
   description = "AWS Access Key ID for the Flask app to access S3"
