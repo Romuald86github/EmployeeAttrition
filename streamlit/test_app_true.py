@@ -4,8 +4,15 @@ import pandas as pd
 import streamlit as st
 
 def load_model():
-    best_model = pickle.load('best_model.pkl')
-    preprocessing_pipeline = pickle.load('src/models/preprocessing_pipeline.pkl')
+    model_path = os.path.join("..", "best_model.pkl")
+    pipeline_path = os.path.join("..", "src", "models", "preprocessing_pipeline.pkl")
+
+    with open(model_path, 'rb') as f:
+        best_model = pickle.load(f)
+
+    with open(pipeline_path, 'rb') as f:
+        preprocessing_pipeline = pickle.load(f)
+
     return best_model, preprocessing_pipeline
 
 def run_streamlit_app():
