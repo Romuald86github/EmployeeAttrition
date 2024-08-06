@@ -3,9 +3,12 @@ import pickle
 import pandas as pd
 import streamlit as st
 
+# Get the current script's directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 # Set the paths to the model and pipeline files
-model_path = os.path.join("..", "best_model.pkl")
-pipeline_path = os.path.join("..", "src", "models", "preprocessing_pipeline.pkl")
+model_path = os.path.join(script_dir, "..", "best_model.pkl")
+pipeline_path = os.path.join(script_dir, "..", "src", "models", "preprocessing_pipeline.pkl")
 
 # Load the best model
 with open(model_path, 'rb') as f:
